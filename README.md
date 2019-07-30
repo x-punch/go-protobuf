@@ -13,9 +13,14 @@ import (
 )
 
 func main() {
-    resp := &pb.Value{Kind: &pb.Value_NumberValue{NumberValue: 666}}
+    req, err := protobuf.MarshalValue(666)
+    if err != nil {
+        fmt.Fatal(err)
+    }
+    fmt.Println(req)
 
-    v := protobuf.GetValue(resp)
+    resp := &pb.Value{Kind: &pb.Value_NumberValue{NumberValue: 666}}
+    v := protobuf.UnmarshalValue(resp)
     fmt.Println(v)
 }
 ```

@@ -7,41 +7,41 @@ import (
 	"github.com/x-punch/go-protobuf"
 )
 
-func TestNumberValue(t *testing.T) {
+func TestUnmarshalNumberValue(t *testing.T) {
 	num := float64(123)
 	p := &pb.Value{Kind: &pb.Value_NumberValue{NumberValue: num}}
-	v := protobuf.GetValue(p)
+	v := protobuf.UnmarshalValue(p)
 	if v != num {
 		t.Fail()
 	}
 }
 
-func TestStringValue(t *testing.T) {
+func TestUnmarshalStringValue(t *testing.T) {
 	str := "string"
 	p := &pb.Value{Kind: &pb.Value_StringValue{StringValue: str}}
-	v := protobuf.GetValue(p)
+	v := protobuf.UnmarshalValue(p)
 	if v != str {
 		t.Fail()
 	}
 }
 
-func TestNullValue(t *testing.T) {
+func TestUnmarshalNullValue(t *testing.T) {
 	p := &pb.Value{Kind: &pb.Value_NullValue{}}
-	v := protobuf.GetValue(p)
+	v := protobuf.UnmarshalValue(p)
 	if v != nil {
 		t.Fail()
 	}
 }
 
-func TestBoolValue(t *testing.T) {
+func TestUnmarshalBoolValue(t *testing.T) {
 	p := &pb.Value{Kind: &pb.Value_BoolValue{BoolValue: true}}
-	v := protobuf.GetValue(p)
+	v := protobuf.UnmarshalValue(p)
 	if v != true {
 		t.Fail()
 	}
 }
 
-func TestStructValue(t *testing.T) {
+func TestUnmarshalStructValue(t *testing.T) {
 	v1 := float64(123)
 	v2 := "strings"
 	p := &pb.Value{Kind: &pb.Value_StructValue{StructValue: &pb.Struct{
@@ -50,7 +50,7 @@ func TestStructValue(t *testing.T) {
 			"v2": &pb.Value{Kind: &pb.Value_StringValue{StringValue: v2}},
 		},
 	}}}
-	v := protobuf.GetValue(p)
+	v := protobuf.UnmarshalValue(p)
 	if maps, ok := v.(map[string]interface{}); ok {
 		if len(maps) == 2 && maps["v1"] == v1 && maps["v2"] == v2 {
 			return
@@ -59,7 +59,7 @@ func TestStructValue(t *testing.T) {
 	t.Fail()
 }
 
-func TestListValue(t *testing.T) {
+func TestUnmarshalListValue(t *testing.T) {
 	v1 := float64(123)
 	v2 := "strings"
 	p := &pb.Value{Kind: &pb.Value_ListValue{ListValue: &pb.ListValue{
@@ -68,11 +68,72 @@ func TestListValue(t *testing.T) {
 			&pb.Value{Kind: &pb.Value_StringValue{StringValue: v2}},
 		},
 	}}}
-	v := protobuf.GetValue(p)
+	v := protobuf.UnmarshalValue(p)
 	if array, ok := v.([]interface{}); ok {
 		if len(array) == 2 && array[0] == v1 && array[1] == v2 {
 			return
 		}
 	}
 	t.Fail()
+}
+
+func TestMarshalNull(t *testing.T) {
+	v, err := protobuf.MarshalValue(nil)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	r := &pb.Value{Kind: &pb.Value_NullValue{}}
+	if v.String() != r.String() {
+		t.Fatal(v.String())
+	}
+}
+
+func TestMarshalNumber(t *testing.T) {
+	v, err := protobuf.MarshalValue(123)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	r := &pb.Value{Kind: &pb.Value_NumberValue{NumberValue: 123}}
+	if v.String() != r.String() {
+		t.Fatal(v.String())
+	}
+}
+
+func TestMarshalBool(t *testing.T) {
+	b := true
+	v, err := protobuf.MarshalValue(b)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	r := &pb.Value{Kind: &pb.Value_BoolValue{BoolValue: b}}
+	if v.String() != r.String() {
+		t.Fatal(v.String())
+	}
+}
+
+func TestMarshalString(t *testing.T) {
+	s := ""
+	v, err := protobuf.MarshalValue(s)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	r := &pb.Value{Kind: &pb.Value_StringValue{StringValue: s}}
+	if v.String() != r.String() {
+		t.Fatal(v.String())
+	}
+}
+
+func TestMarshalUnsupportType(t *testing.T) {
+	v, err := protobuf.MarshalValue(make([]string, 0))
+	if v != nil || err == nil || err.Error() != "Unsupported marshal type: slice" {
+		t.Fatal(err)
+	}
+	v, err = protobuf.MarshalValue(make(map[string]interface{}, 0))
+	if !(v == nil && err != nil && err.Error() == "Unsupported marshal type: map") {
+		t.Fatal(err)
+	}
+	v, err = protobuf.MarshalValue(struct{}{})
+	if !(v == nil && err != nil && err.Error() == "Unsupported marshal type: struct") {
+		t.Fatal(err)
+	}
 }
