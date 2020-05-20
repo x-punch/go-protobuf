@@ -46,8 +46,8 @@ func TestUnmarshalStructValue(t *testing.T) {
 	v2 := "strings"
 	p := &pb.Value{Kind: &pb.Value_StructValue{StructValue: &pb.Struct{
 		Fields: map[string]*pb.Value{
-			"v1": &pb.Value{Kind: &pb.Value_NumberValue{NumberValue: v1}},
-			"v2": &pb.Value{Kind: &pb.Value_StringValue{StringValue: v2}},
+			"v1": {Kind: &pb.Value_NumberValue{NumberValue: v1}},
+			"v2": {Kind: &pb.Value_StringValue{StringValue: v2}},
 		},
 	}}}
 	v := protobuf.UnmarshalValue(p)
@@ -64,8 +64,8 @@ func TestUnmarshalListValue(t *testing.T) {
 	v2 := "strings"
 	p := &pb.Value{Kind: &pb.Value_ListValue{ListValue: &pb.ListValue{
 		Values: []*pb.Value{
-			&pb.Value{Kind: &pb.Value_NumberValue{NumberValue: v1}},
-			&pb.Value{Kind: &pb.Value_StringValue{StringValue: v2}},
+			{Kind: &pb.Value_NumberValue{NumberValue: v1}},
+			{Kind: &pb.Value_StringValue{StringValue: v2}},
 		},
 	}}}
 	v := protobuf.UnmarshalValue(p)

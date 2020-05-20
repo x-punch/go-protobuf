@@ -12,34 +12,34 @@ func UnmarshalValue(v *pb.Value) interface{} {
 	if v == nil {
 		return nil
 	}
-	k := reflect.ValueOf(v).Elem().Field(0).Elem().Elem().Field(0)
-	if wkt, ok := k.Interface().(wkt); ok {
-		switch wkt.XXX_WellKnownType() {
-		case "NullValue":
+	value := reflect.ValueOf(v.Kind).Elem().Field(0).Interface()
+	switch value.(type) {
+	case pb.NullValue: //compatiable with golang/protobuf@1.3.x
+		return nil
+	case *pb.NullValue:
+		return nil
+	case *pb.Struct:
+		s := v.GetStructValue()
+		if s == nil {
 			return nil
-		case "Struct":
-			s := v.GetStructValue()
-			if s == nil {
-				return nil
-			}
-			vals := make(map[string]interface{})
-			for k, v := range s.Fields {
-				vals[k] = UnmarshalValue(v)
-			}
-			return vals
-		case "ListValue":
-			s := v.GetListValue()
-			if s == nil {
-				return nil
-			}
-			vals := make([]interface{}, 0, len(s.Values))
-			for _, v := range s.Values {
-				vals = append(vals, UnmarshalValue(v))
-			}
-			return vals
 		}
+		vals := make(map[string]interface{})
+		for k, v := range s.Fields {
+			vals[k] = UnmarshalValue(v)
+		}
+		return vals
+	case *pb.ListValue:
+		s := v.GetListValue()
+		if s == nil {
+			return nil
+		}
+		vals := make([]interface{}, 0, len(s.Values))
+		for _, v := range s.Values {
+			vals = append(vals, UnmarshalValue(v))
+		}
+		return vals
 	}
-	return k.Interface()
+	return value
 }
 
 // MarshalValue convert generic type into protobuf value type
