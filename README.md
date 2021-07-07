@@ -6,21 +6,21 @@ A go protobuf library, used to help parse data from protobuf or parse to protobu
 package main
 
 import (
-    "fmt"
+	"fmt"
 
+	"github.com/x-punch/go-protobuf"
 	pb "google.golang.org/protobuf/types/known/structpb"
-    "github.com/x-punch/go-protobuf"
 )
 
 func main() {
-    req, err := protobuf.MarshalValue(666)
-    if err != nil {
-        fmt.Fatal(err)
-    }
-    fmt.Println(req)
+	req, err := protobuf.MarshalValue(666)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(req)
 
-    resp := &pb.Value{Kind: &pb.Value_NumberValue{NumberValue: 666}}
-    v := protobuf.UnmarshalValue(resp)
-    fmt.Println(v)
+	resp := &pb.Value{Kind: &pb.Value_NumberValue{NumberValue: 666}}
+	v := protobuf.UnmarshalValue(resp)
+	fmt.Println(v)
 }
 ```
