@@ -3,8 +3,8 @@ package protobuf_test
 import (
 	"testing"
 
-	pb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/x-punch/go-protobuf"
+	pb "google.golang.org/protobuf/types/known/structpb"
 )
 
 func TestUnmarshalNumberValue(t *testing.T) {
@@ -128,7 +128,7 @@ func TestMarshalUnsupportType(t *testing.T) {
 	if v != nil || err == nil || err.Error() != "Unsupported marshal type: slice" {
 		t.Fatal(err)
 	}
-	v, err = protobuf.MarshalValue(make(map[string]interface{}, 0))
+	v, err = protobuf.MarshalValue(make(map[string]interface{}))
 	if !(v == nil && err != nil && err.Error() == "Unsupported marshal type: map") {
 		t.Fatal(err)
 	}

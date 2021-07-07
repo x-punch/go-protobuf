@@ -8,7 +8,7 @@ package main
 import (
     "fmt"
 
-	pb "github.com/golang/protobuf/ptypes/struct"
+	pb "google.golang.org/protobuf/types/known/structpb"
     "github.com/x-punch/go-protobuf"
 )
 

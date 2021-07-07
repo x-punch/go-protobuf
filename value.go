@@ -4,7 +4,7 @@ import (
 	"errors"
 	"reflect"
 
-	pb "github.com/golang/protobuf/ptypes/struct"
+	pb "google.golang.org/protobuf/types/known/structpb"
 )
 
 // UnmarshalValue convert protobuf value type into generic value type
